@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.BulletinMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.Bulletin">
+		<result column="bulletinid" jdbcType="INTEGER" property="bulletinid" />
+		<result column="aid" jdbcType="VARCHAR" property="aid" />
+		<result column="title" jdbcType="VARCHAR" property="title" />
+		<result column="DATE_FORMAT(a.releaseBegin,'%Y-%m-%d')" property="releaseBegin" />
+		<result column="DATE_FORMAT(a.releaseEnd,'%Y-%m-%d')" property="releaseEnd" />
+		<result column="content" jdbcType="LONGVARCHAR" property="content" />
+
+		<association property="admin" javaType="com.JOVO.model.Admin">
+			<id property="aid" column="aid" />
+			<result column="aphoto" property="aphoto" />
+			<result column="aname" property="aname" />
+			<result column="apwd" property="apwd" />
+		</association>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		a.bulletinid, a.aid, a.title,
+		DATE_FORMAT(a.releaseBegin,'%Y-%m-%d'),DATE_FORMAT(a.releaseEnd,'%Y-%m-%d'),a.content,b.aid,b.aname
+	</sql>
+
+	<sql id="Base_Column_List1">
+		a.bulletinid, a.title,
+		DATE_FORMAT(a.releaseBegin,'%Y-%m-%d'),DATE_FORMAT(a.releaseEnd,'%Y-%m-%d'),a.content
+	</sql>
+
+	<select id="bulletins" resultMap="BaseResultMap" parameterType="string">
+		select
+		<include refid="Base_Column_List1" />
+		from bulletininfo a inner join admininfo b on a.aid=b.aid where
+		a.aid='${aid}'
+	</select>
+
+	<select id="select" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from bulletininfo a inner join admininfo b on a.aid=b.aid
+	</select>
+
+
+	<delete id="delete" parameterType="int">
+		delete from bulletininfo where
+		bulletinid=#{bulletinid}
+	</delete>
+
+	<insert id="insert" parameterType="com.JOVO.model.Bulletin"
+		keyProperty="bulletinid" useGeneratedKeys="true">
+		insert into bulletininfo
+		(aid,
+		title,releaseBegin,releaseEnd, content)
+		values
+		(#{aid,jdbcType=VARCHAR},
+		#{title,jdbcType=VARCHAR},
+		#{releaseBegin,jdbcType=DATE},
+		#{releaseEnd,jdbcType=DATE},
+		#{content,jdbcType=LONGVARCHAR})
+	</insert>
+
+	<update id="update" parameterType="com.JOVO.model.Bulletin">
+		update bulletininfo
+		set
+		aid = #{aid,jdbcType=VARCHAR},
+		title =
+		#{title,jdbcType=VARCHAR},
+		content = #{content,jdbcType=LONGVARCHAR},
+		releaseBegin = #{releaseBegin,jdbcType=DATE}
+		<if test="releaseEnd!=''">
+			,releaseEnd = #{releaseEnd,jdbcType=DATE}
+		</if>
+		where bulletinid = #{bulletinid,jdbcType=INTEGER}
+	</update>
+
+	<update id="updateRelease" parameterType="com.JOVO.model.Bulletin">
+		update bulletininfo
+		set
+		releaseBegin = #{releaseBegin,jdbcType=DATE},
+		releaseEnd =
+		#{releaseEnd,jdbcType=DATE}
+		where bulletinid =
+		#{bulletinid,jdbcType=INTEGER}
+	</update>
+</mapper>

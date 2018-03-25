@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.AuditTeacherMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.Teacher">
+		<result column="tid" jdbcType="INTEGER" property="tid" />
+		<result column="tnum" jdbcType="VARCHAR" property="tnum" />
+		<result column="tpwd" jdbcType="VARCHAR" property="tpwd" />
+
+		<association property="teacherDetail" javaType="com.JOVO.model.TeacherDetail">
+			<id property="tid" column="tid" />
+			<result property="tname" column="tname"/>
+			<result property="tphoto" column="tphoto" />
+			<result property="tphone" column="tphone" />
+			<result property="tinfo" column="tinfo" />
+			<result property="tsource" column="tsource" />
+		</association>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		t.tid, t.tnum, t.tpwd, t1.tphoto, t1.tphone, t1.tsource, t1.tname
+	</sql>
+
+	<select id="selectAll" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from teacherinfo t inner join teacherDetailinfo t1 on t.tid=t1.tid where ispass=0
+	</select>
+
+	<select id="selectOne" parameterType="int" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from teacherDetailinfo where tid=#{tid}
+	</select>
+
+	<delete id="delete" parameterType="int">
+		delete from teacherDetailinfo where tid=#{tid}
+	</delete>
+
+
+	<update id="update" parameterType="int">
+		update teacherDeatilinfo
+		set ispass=#{record.ispass,jdbcType=INTEGER}
+		where tid = #{record.tid,jdbcType=INTEGER}
+	</update>
+</mapper>

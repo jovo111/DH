@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.CourseMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.Course">
+		<result column="cid" jdbcType="INTEGER" property="cid" />
+		<result column="tid" jdbcType="INTEGER" property="tid" />
+		<result column="cname" jdbcType="VARCHAR" property="cname" />
+		<result column="cinfo" jdbcType="VARCHAR" property="cinfo" />
+		<result column="typeid" jdbcType="INTEGER" property="typeid" />
+		<result column="cprice" jdbcType="REAL" property="cprice" />
+		<result column="cphoto" jdbcType="VARCHAR" property="cphoto" />
+	</resultMap>
+	
+	<resultMap id="Courses" type="com.JOVO.model.Course">
+		<result column="cid" jdbcType="INTEGER" property="cid" />
+		<result column="cname" jdbcType="VARCHAR" property="cname" />
+		<result column="typeid" jdbcType="INTEGER" property="typeid" />
+		<result column="cprice" jdbcType="REAL" property="cprice" />
+		<result column="cphoto" jdbcType="VARCHAR" property="cphoto" />
+		<result column="stucount" jdbcType="INTEGER" property="stucount"/>
+		<association property="courseType" javaType="com.JOVO.model.CourseType">
+			<id column="typeid" jdbcType="INTEGER" property="typeid" />
+			<result column="typename" jdbcType="VARCHAR" property="typename" />
+		</association>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		cid, tid, cname, cinfo,typeid, cprice, cphoto
+	</sql>
+
+	<sql id="courses">
+		c.cname,c.cphoto,c.cprice,c.stucount,c.typeid,type.typename
+	</sql>
+
+	<select id="select" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from courseinfo
+	</select>
+
+	<select id="selectOne" resultMap="BaseResultMap" parameterType="int">
+		select
+		<include refid="Base_Column_List" />
+		from courseinfo where cid=#{cid}
+	</select>
+
+	<select id="selectType" parameterType="int" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		,
+		(select count(cc.cid)from taskinfo as cc where cc.cid=go.cid)as count
+		from courseinfo go where typeid=#{typeid}
+	</select>
+
+	<select id="querycount" parameterType="int" resultType="java.lang.Integer">
+		select count(*)
+		from courseinfo where typeid=#{typeid}
+	</select>
+
+	<delete id="delete" parameterType="int">
+		delete from courseinfo
+	</delete>
+
+
+	<insert id="insert" parameterType="com.JOVO.model.Course">
+		insert into courseinfo (cid, tid, cphone,
+		cname, cinfo, typeid,
+		cprice, cphoto)
+		values (#{cid,jdbcType=INTEGER}, #{tid,jdbcType=INTEGER},
+		#{cphone,jdbcType=VARCHAR},
+		#{cname,jdbcType=VARCHAR}, #{cinfo,jdbcType=VARCHAR}, #{typeid,jdbcType=INTEGER},
+		#{cprice,jdbcType=REAL}, #{cphoto,jdbcType=VARCHAR})
+	</insert>
+
+
+	<update id="update" parameterType="map">
+		update courseinfo
+		set tid = #{record.tid,jdbcType=INTEGER},
+		cphone = #{record.cphone,jdbcType=VARCHAR},
+		cname = #{record.cname,jdbcType=VARCHAR},
+		cinfo = #{record.cinfo,jdbcType=VARCHAR},
+		typeid = #{record.typeid,jdbcType=INTEGER},
+		cprice = #{record.cprice,jdbcType=REAL},
+		cphoto = #{record.cphoto,jdbcType=VARCHAR}
+		where cid = #{record.cid,jdbcType=INTEGER}
+	</update>
+
+	<select id="selectTop" resultType="int" parameterType="int">
+		<!-- 按照查询第一条数据 -->
+		select cid from courseinfo where typeid=#{typeid} ORDER BY cid LIMIT
+		1;
+	</select>
+
+	<select id="selectTopName" resultType="string" parameterType="int">
+		select cname from courseinfo where typeid=#{typeid} ORDER BY cid LIMIT
+		1;
+	</select>
+
+	<select id="selectTwo" resultType="String" parameterType="int">
+		select cname from courseinfo where cid=#{cid};
+	</select>
+
+
+	<select id="selectCourses" resultMap="Courses" parameterType="int">
+		select
+		<include refid="courses" />
+		from courseinfo c inner join teacherdetailinfo t on t.tid=c.cid
+		inner join coursetypeinfo type on c.typeid=type.typeid  where t.tid=#{tid}
+	</select>
+
+
+</mapper>

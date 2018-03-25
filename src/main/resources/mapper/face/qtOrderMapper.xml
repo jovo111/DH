@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.face.qtOrderMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.Order">
+		<result column="oid" jdbcType="INTEGER" property="oid" />
+		<result column="cid" jdbcType="INTEGER" property="cid" />
+		<result column="sid" jdbcType="INTEGER" property="sid" />
+		<result column="otime" jdbcType="DATE" property="otime" />
+		<result column="isbuy" jdbcType="INTEGER" property="isbuy" />
+	</resultMap>
+
+	<resultMap id="OrderMap" type="com.JOVO.model.Order">
+		<result column="oid" jdbcType="INTEGER" property="oid" />
+		<result column="cid" jdbcType="INTEGER" property="cid" />
+		<result column="sid" jdbcType="INTEGER" property="sid" />
+		<result column="isbuy" jdbcType="INTEGER" property="isbuy" />
+		<association property="course" javaType="com.JOVO.model.Course">
+			<id property="cid" column="cid" />
+			<result column="tid" property="tid" />
+			<result column="cname" property="cname" />
+			<result column="cprice" property="cprice" />
+			<result column="cphoto" property="cphoto" />
+			<association property="teacherDetail" javaType="com.JOVO.model.TeacherDetail">
+				<id property="tid" column="tid" />
+				<result property="tname" column="tname" />
+				<result property="tsource" column="tsource" />
+			</association>
+		</association>
+	</resultMap>
+
+	<sql id="Baselist">
+		c.cphoto,c.cname,c.cprice,o.isbuy,o.oid,o.sid,t.tname,t.tsource
+	</sql>
+
+	<select id="orderCount" resultType="long" parameterType="int">
+		select
+		count(sid)
+		from orderinfo where sid=#{sid}
+	</select>
+
+	<select id="isOrder" resultType="long" parameterType="int">
+		select
+		count(sid)
+		from orderinfo where sid=#{sid} and isbuy=1
+	</select>
+
+	<select id="notOrder" resultType="long" parameterType="int">
+		select
+		count(sid)
+		from orderinfo where sid=#{sid} and isbuy=0
+	</select>
+
+
+
+	<select id="select" resultMap="OrderMap">
+		select
+		<include refid="Baselist" />
+		FROM orderinfo o INNER JOIN courseinfo c ON o.cid=c.cid INNER JOIN
+		teacherdetailinfo t ON c.tid=t.tid WHERE o.sid=#{sid} AND o.isbuy=0;
+	</select>
+	
+	<select id="select_on" resultMap="OrderMap">
+		select
+		<include refid="Baselist" />
+		FROM orderinfo o INNER JOIN courseinfo c ON o.cid=c.cid INNER JOIN
+		teacherdetailinfo t ON c.tid=t.tid WHERE o.sid=#{sid} AND o.isbuy=1;
+	</select>
+	<delete id="delete" parameterType="int">
+		delete from orderinfo where
+		oid=#{oid}
+	</delete>
+	
+	<select id="selectcount" resultType="Integer">
+		select count(*) from orderinfo where sid=#{sid} and cid=#{cid}
+	</select>
+</mapper>

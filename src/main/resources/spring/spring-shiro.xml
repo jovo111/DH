@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<context:component-scan base-package="com.JOVO.service" />
+	<!-- 安全管理器 1.缓存技术：缓存管理 2.realm:负责获取处理数据 -->
+	
+	<bean id="authenticator" class="com.JOVO.shiro.CustomModularRealmAuthenticator">
+        <property name="definedRealms">    
+            <map>    
+                <entry key="admin" value-ref="adminRealm" />
+                <entry key="student" value-ref="studentRealm" />
+                <entry key="teacher" value-ref="teacherRealm" />
+            </map>   
+        </property>
+        <property name="authenticationStrategy">    
+            <bean class="org.apache.shiro.authc.pam.FirstSuccessfulStrategy" />
+            <!-- 配置认证策略，只要有一个Realm认证成功即可，并且返回所有认证成功信息 -->
+            <!-- <bean class="org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy" /> -->
+        </property>
+    </bean>
+    
+    
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="cacheManager" ref="cacheManager" />
+		<property name="authenticator" ref="authenticator"></property>
+		<property name="realms">
+			<list>
+				<ref bean="adminRealm" />
+				<ref bean="studentRealm" />
+				<ref bean="teacherRealm" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="adminRealm" class="com.JOVO.shiro.AdminRealm"><!-- <property name="credentialsMatcher"> 
+			<bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher"> 
+			<property name="hashAlgorithmName" value="MD5"></property> <property name="hashIterations" 
+			value="1024"></property> </bean> </property> -->
+	</bean>
+
+	<bean id="studentRealm" class="com.JOVO.shiro.StudentRealm"><!-- <property name="credentialsMatcher"> 
+			<bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher"> 
+			<property name="hashAlgorithmName" value="MD5"></property> <property name="hashIterations" 
+			value="1024"></property> </bean> </property> -->
+	</bean>
+
+	<bean id="teacherRealm" class="com.JOVO.shiro.TeacherRealm"><!-- <property name="credentialsMatcher"> 
+			<bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher"> 
+			<property name="hashAlgorithmName" value="MD5"></property> <property name="hashIterations" 
+			value="1024"></property> </bean> </property> -->
+	</bean>
+
+	<!-- 我们可以使用的缓存技术 -->
+	<bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+		<property name="cacheManagerConfigFile" value="classpath:config/ehcache.xml"></property>
+	</bean>
+
+
+	<!-- 必须 有这样的实例， 用来管理在Spring容器当中的Shiro常见的对象 -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+	<!-- 启动Shiro注解 -->
+	<bean
+		class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+		depends-on="lifecycleBeanPostProcessor" />
+	<bean
+		class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+
+	<!-- 网络方面 -->
+	<bean id="secureRemoteInvocationExecutor"
+		class="org.apache.shiro.spring.remoting.SecureRemoteInvocationExecutor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+
+	<!-- 配置Shiro过滤器 1.shiroFilter这个bean的id必须与web.xml文件中filter-name保持一致 -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="/admin/" />
+		<property name="successUrl" value="/admin/login" />
+		<property name="unauthorizedUrl" value="/error/" />
+		<property name="filterChainDefinitions">
+			<value>
+				<!-- /admin/ = anon /admin/loginin=anon /admin/reigster=anon /admin/student*=anon 
+					/admin/teacher*=anon /image/**=anon /js/**=anon /css/**=anon /admin.jsp=roles[admin] 
+					/login.jsp=roles[user] /** = authc -->
+
+				<!-- /admin/=anon /admin/login=anon /admin/**=authc,roles[admin] -->
+				
+				
+				/**=anon
+			</value>
+		</property>
+	</bean>
+</beans>

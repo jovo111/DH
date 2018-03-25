@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.face.qtCourseMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.Course">
+		<result column="cid" jdbcType="INTEGER" property="cid" />
+		<result column="tid" jdbcType="INTEGER" property="tid" />
+		<result column="cname" jdbcType="VARCHAR" property="cname" />
+		<result column="cinfo" jdbcType="VARCHAR" property="cinfo" />
+		<result column="typeid" jdbcType="INTEGER" property="typeid" />
+		<result column="cprice" jdbcType="REAL" property="cprice" />
+		<result column="cphoto" jdbcType="VARCHAR" property="cphoto" />
+		<result column="stucount" jdbcType="INTEGER" property="stucount" />
+		<association property="teacherDetail" javaType="com.JOVO.model.TeacherDetail">
+			<id property="tid" column="tid" />
+			<result property="tname" column="tname" />
+			<result property="tphoto" column="tphoto" />
+			<result property="tphone" column="tphone" />
+			<result property="tinfo" column="tinfo" />
+			<result property="tsource" column="tsource" />
+		</association>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		cid, tid, cphone, cname, cinfo, typeid, cprice,
+		cphoto,stucount
+	</sql>
+
+	<sql id="index_List">
+		c.cid,c.cphoto,c.cname,c.cinfo,c.cprice,t2.tname,t2.tsource,c.stucount
+	</sql>
+	<select id="free" resultMap="BaseResultMap">
+		select
+		<include refid="index_List" />
+		from courseinfo c inner join teacherinfo t1 on c.tid=t1.tid inner join
+		teacherdetailinfo t2 on t1.tid=t2.tid inner join mycourseinfo m on
+		c.cid=m.cid
+		where c.cprice=0 and c.ispass=1 group by m.cid order by count(m.cid) desc
+		limit 4 ;
+	</select>
+
+	<select id="pay" resultMap="BaseResultMap">
+		select
+		<include refid="index_List" />
+		from courseinfo c inner join teacherinfo t1 on c.tid=t1.tid inner join
+		teacherdetailinfo t2 on t1.tid=t2.tid inner join mycourseinfo m on
+		c.cid=m.cid
+		where c.cprice!=0 and c.ispass=1 group by m.cid order by count(m.cid) desc
+		limit 6 ;
+	</select>
+	<select id="payRank" resultMap="BaseResultMap">
+		select c.cname
+		from courseinfo c
+		where c.cprice!=0 and c.ispass=1 order by c.stucount desc limit 9;
+	</select>
+	<select id="freeRank" resultMap="BaseResultMap">
+		select c.cname
+		from courseinfo c
+		where c.cprice=0 and c.ispass=1 order by c.stucount desc limit 9;
+	</select>
+	<select id="all" resultMap="BaseResultMap" parameterType="Integer">
+		select
+		<include refid="index_List" />
+		from courseinfo c inner join teacherinfo t1 on c.tid=t1.tid inner join
+		teacherdetailinfo t2 on t1.tid=t2.tid
+		where c.typeid=${typeid}  and c.ispass=1 order by
+		c.stucount desc
+	</select>
+
+	<select id="watchlist" resultMap="BaseResultMap" parameterType="Integer">
+		select
+		<include refid="index_List" />
+		from courseinfo c inner join teacherinfo t1 on c.tid=t1.tid inner join
+		teacherdetailinfo t2 on t1.tid=t2.tid
+		where c.typeid=${typeid}  and c.ispass=1 order by
+		c.stucount
+	</select>
+
+	<select id="freelist" resultMap="BaseResultMap" parameterType="Integer">
+		select
+		<include refid="index_List" />
+		from courseinfo c inner join teacherinfo t1 on c.tid=t1.tid inner join
+		teacherdetailinfo t2 on t1.tid=t2.tid
+		where c.typeid=${typeid} and
+		c.cprice=0  and c.ispass=1 order by c.stucount desc
+	</select>
+
+	<select id="paylist" resultMap="BaseResultMap" parameterType="Integer">
+		select
+		<include refid="index_List" />
+		from courseinfo c inner join teacherinfo t1 on c.tid=t1.tid inner join
+		teacherdetailinfo t2 on t1.tid=t2.tid
+		where c.typeid=${typeid} and
+		c.cprice!=0  and c.ispass=1 order by c.stucount desc
+	</select>
+
+
+	<select id="notMoney" resultMap="BaseResultMap">
+		select
+		<include refid="index_List" />
+		from courseinfo c inner join teacherinfo t1 on c.tid=t1.tid inner join
+		teacherdetailinfo t2 on t1.tid=t2.tid
+		where c.cprice=0  and c.ispass=1 order by c.stucount desc
+		<if test="example ==null">
+			limit 4
+		</if> 
+		
+	</select>
+
+	<select id="isMoney" resultMap="BaseResultMap">
+		select
+		<include refid="index_List" />
+		from courseinfo c inner join teacherinfo t1 on c.tid=t1.tid inner join
+		teacherdetailinfo t2 on t1.tid=t2.tid
+		where c.cprice!=0  and c.ispass=1 order by c.stucount desc
+		<if test="example ==null">
+			limit 6
+		</if>
+	</select>
+	
+	<select id="selectCourse" resultMap="BaseResultMap">
+		select
+		<include refid="index_List" />
+		from courseinfo c inner join teacherinfo t1 on c.tid=t1.tid inner join
+		teacherdetailinfo t2 on t1.tid=t2.tid
+		where cname LIKE '%${example}%'  and c.ispass=1 order by c.stucount desc
+	</select>
+
+	<select id="goodTeacher" resultMap="BaseResultMap">
+		select
+		c.cid,t2.tid,t2.tname,t2.tsource,t2.tphoto
+		from courseinfo c inner join teacherinfo t1 on c.tid=t1.tid inner join
+		teacherdetailinfo t2 on t1.tid=t2.tid  and c.ispass=1
+		order by c.stucount desc limit 5 ;
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.AuditCourseMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.Course">
+		<result column="cid" jdbcType="INTEGER" property="cid" />
+		<result column="tid" jdbcType="INTEGER" property="tid" />
+		<result column="cname" jdbcType="VARCHAR" property="cname" />
+		<result column="cinfo" jdbcType="VARCHAR" property="cinfo" />
+		<result column="typeid" jdbcType="INTEGER" property="typeid" />
+		<result column="cprice" jdbcType="REAL" property="cprice" />
+		<result column="cphoto" jdbcType="VARCHAR" property="cphoto" />
+		<result column="stucount" jdbcType="INTEGER" property="stucount" />
+		<result column="ispass" jdbcType="INTEGER" property="ispass" />
+		<result column="createtime" jdbcType="DATE" property="createtime" />
+		
+		<association property="teacherDetail" javaType="com.JOVO.model.TeacherDetail">
+			<result column="tname" property="tname" />
+			<result column="tsource" property="tsource" />
+		</association>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		a.cid,a.cname,a.cinfo,a.typeid,a.cprice,a.cphoto,a.createtime,a.ispass,t.tname,t.tsource
+	</sql>
+
+	<select id="selectAll" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from courseinfo a inner join teacherdetailinfo t on a.tid=t.tid where a.ispass=0
+	</select>
+	
+	<select id="selectOne" parameterType="int" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from courseinfo a inner join teacherdetailinfo t on a.tid=t.tid 
+		where cid=#{cid}
+	</select>
+
+	<update id="update" parameterType="com.JOVO.model.Course">
+		update courseinfo
+		set ispass =#{record.ispass,jdbcType=INTEGER} 
+		where cid =#{record.cid,jdbcType=INTEGER} 
+	</update>
+</mapper>

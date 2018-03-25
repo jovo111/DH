@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.OrderMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.Order">
+		<result column="oid" jdbcType="INTEGER" property="oid" />
+		<result column="cid" jdbcType="INTEGER" property="cid" />
+		<result column="sid" jdbcType="INTEGER" property="sid" />
+		<result column="DATE_FORMAT(o.otime,'%Y-%m-%d')" property="otime" />
+		<result column="isbuy" jdbcType="INTEGER" property="isbuy" />
+		<association property="course" javaType="com.JOVO.model.Course">
+			<id property="cid" column="cid" />
+			<result column="tid" property="tid" />
+			<result column="cphone" property="cphone" />
+			<result column="cname" property="cname" />
+			<result column="cinfo" property="cinfo" />
+			<result column="typeid" property="typeid" />
+			<result column="cprice" property="cprice" />
+			<result column="cphoto" property="cphoto" />
+		</association>
+		<association property="student" javaType="com.JOVO.model.Student">
+			<id column="sid" jdbcType="INTEGER" property="sid" />
+			<result column="snum" jdbcType="VARCHAR" property="snum" />
+			<result column="spwd" jdbcType="VARCHAR" property="spwd" />
+			<association property="studentDetail" javaType="com.JOVO.model.StudentDetail">
+				<id property="sid" column="sid" />
+				<result property="sphoto" column="sphoto" />
+				<result property="snick" column="snick" />
+				<result property="sbalance" column="sbalance" />
+			</association>
+		</association>
+	</resultMap>
+
+
+	<resultMap id="Orders" type="com.JOVO.model.Order">
+		<result column="oid" jdbcType="INTEGER" property="oid" />
+		<result column="cid" jdbcType="INTEGER" property="cid" />
+		<result column="sid" jdbcType="INTEGER" property="sid" />
+		<result column="DATE_FORMAT(o.otime,'%Y-%m-%d')" property="otime" />
+		<result column="isbuy" jdbcType="INTEGER" property="isbuy" />
+		<association property="course" javaType="com.JOVO.model.Course">
+			<id property="cid" column="cid" />
+			<result column="cname" property="cname" />
+			<result column="cprice" property="cprice" />
+		</association>
+		<association property="studentDetail" javaType="com.JOVO.model.StudentDetail">
+			<id property="sid" column="sid" />
+			<result property="snick" column="snick" />
+		</association>
+	</resultMap>
+
+
+	<sql id="query_list">
+		o.oid,s.snick,c.tid,c.cname,c.cprice,DATE_FORMAT(o.otime,'%Y-%m-%d'),o.isbuy
+	</sql>
+
+	<select id="queryselect" resultMap="Orders">
+		select
+		<include refid="query_list" />
+		from orderinfo o inner join courseinfo c on o.cid=c.cid inner join
+		studentdetailinfo s on o.sid=s.sid
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="oid !=null">
+				o.oid like '%${oid}%'
+			</if>
+			<if test="isbuy != null">
+				and o.isbuy like '%${isbuy}%'
+			</if>
+			<if test="snick != null">
+				and s.snick like '%${snick}%'
+			</if>
+			<if test="cname != null">
+				and c.cname like '%${cname}%'
+			</if>
+		</trim>
+	</select>
+
+	<select id="totime" resultMap="Orders">
+		select
+		<include refid="query_list" />
+		from orderinfo o inner join courseinfo c on o.cid=c.cid inner join
+		studentdetailinfo s on o.sid=s.sid
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="starting !=null">
+				o.otime &gt;= '${starting}'
+			</if>
+			<if test="ending !=null">
+				and o.otime &lt;= '${ending}'
+			</if>
+		</trim>
+	</select>
+
+	<select id="select_one" resultMap="Orders">
+		select
+		<include refid="query_list" />
+		from orderinfo o inner join courseinfo c on o.cid=c.cid inner join
+		studentdetailinfo s on o.sid=s.sid where o.oid=${oid}
+	</select>
+	<delete id="delete" parameterType="int">
+		delete from orderinfo where
+		oid=#{oid}
+	</delete>
+
+
+	<update id="update" parameterType="com.JOVO.model.Order">
+		update orderinfo
+		set isbuy = 1
+		where oid = #{record.oid,jdbcType=INTEGER}
+	</update>
+
+	<select id="oldOrder" parameterType="int" resultMap="BaseResultMap">
+		select
+		<include refid="query_list" />
+		from orderinfo o inner join courseinfo c on o.cid=c.cid inner join
+		studentdetailinfo s on o.sid=s.sid where s.sid=#{sid}
+	</select>
+
+	<select id="orderCount" parameterType="int" resultType="long">
+		select count(cid) from orderinfo where cid=#{cid}
+	</select>
+
+	<select id="courseOrder" parameterType="int" resultMap="BaseResultMap">
+		select
+		o.isbuy,DATE_FORMAT(o.otime,'%Y-%m-%d'),s.snum,sd.snick
+		from orderinfo o inner join studentinfo s on o.sid=s.sid inner join
+		studentdetailinfo sd on s.sid=sd.sid
+		where o.cid=#{cid}
+	</select>
+
+</mapper>

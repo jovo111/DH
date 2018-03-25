@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.face.qtTeacherMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.Course">
+		<result column="cid" jdbcType="INTEGER" property="cid" />
+		<result column="tid" jdbcType="INTEGER" property="tid" />
+		<result column="cphone" jdbcType="VARCHAR" property="cphone" />
+		<result column="cname" jdbcType="VARCHAR" property="cname" />
+		<result column="cinfo" jdbcType="VARCHAR" property="cinfo" />
+		<result column="typeid" jdbcType="INTEGER" property="typeid" />
+		<result column="cprice" jdbcType="REAL" property="cprice" />
+		<result column="cphoto" jdbcType="VARCHAR" property="cphoto" />
+		<result column="stucount" jdbcType="INTEGER" property="stucount" />
+		<association property="teacherDetail" javaType="com.JOVO.model.TeacherDetail">
+			<id property="tid" column="tid" />
+			<result property="tname" column="tname" />
+			<result property="tphoto" column="tphoto" />
+			<result property="tphone" column="tphone" />
+			<result property="tinfo" column="tinfo" />
+			<result property="tsource" column="tsource" />
+		</association>
+	</resultMap>
+
+	<resultMap id="TeacherDetail" type="com.JOVO.model.TeacherDetail">
+		<id property="tid" column="tid" />
+		<result property="tname" column="tname" />
+		<result property="tphoto" column="tphoto" />
+		<result property="tphone" column="tphone" />
+		<result property="tinfo" column="tinfo" />
+		<result property="tsource" column="tsource" />
+	</resultMap>
+
+	<sql id="index_List">
+		c.cid,c.cphoto,c.cname,c.cinfo,c.cprice,t2.tname,c.stucount
+	</sql>
+
+	<sql id="teacher_List">
+		tid,tname,tphoto,tphone,tinfo,tsource,ispass
+	</sql>
+
+	<sql id="teacherDetail">t.tid,t.tnum,t.tpwd,tname,tphoto,tphone,tinfo,tsource</sql>
+
+
+	<select id="selectCourse" resultMap="BaseResultMap"
+		parameterType="Integer">
+		select
+		<include refid="index_List" />
+		from courseinfo c inner join teacherinfo t1 on c.tid=t1.tid inner join
+		teacherdetailinfo t2 on t1.tid=t2.tid
+		where c.tid=${tid} and c.ispass=1
+		order by
+		c.stucount desc
+	</select>
+
+	<select id="selectTeacher" resultMap="TeacherDetail"
+		parameterType="Integer">
+		select
+		<include refid="teacher_List" />
+		from teacherDetailinfo where tid=${tid}
+	</select>
+
+	<select id="getOne" resultType="com.JOVO.model.Teacher"
+		parameterType="String">
+		select
+		<include refid="teacherDetail" />
+		from teacherinfo
+		t INNER JOIN teacherdetailinfo t2 on t.tid=t2.tid
+		where t.tnum=#{tnum}
+	</select>
+
+	<update id="forget" parameterType="com.JOVO.model.Teacher">
+		update teacherinfo set
+		tpwd=#{tpwd} where tnum=#{tnum};
+	</update>
+
+	<insert id="insertTeacher" parameterType="com.JOVO.model.Teacher"
+		keyProperty="tid" useGeneratedKeys="true">
+		insert into teacherinfo (tnum, tpwd
+		)
+		values (#{tnum,jdbcType=VARCHAR},
+		#{tpwd,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<insert id="insertDetail" parameterType="com.JOVO.model.TeacherDetail">
+		insert into
+		teacherdetailinfo (tid,tname, tphoto, tphone, tinfo, tsource)
+		values
+		(#{tid,jdbcType=INTEGER},#{tname,jdbcType=VARCHAR},
+		#{tphoto,jdbcType=VARCHAR}, #{tphone,jdbcType=VARCHAR},
+		#{tinfo,jdbcType=VARCHAR}, #{tsource,jdbcType=VARCHAR})
+	</insert>
+
+	<update id="updateTeacher">
+		update teacherinfo set
+		tpwd=#{teacher.tpwd} where tnum=#{teacher.tnum};
+		update teacherdetailinfo set tname=#{teacherDetail.tname},tphoto=#{teacherDetail.tphoto},tphone=#{teacherDetail.tphone},tinfo=#{teacherDetail.tinfo},tsource=#{teacherDetail.tsource}
+		where tid=#{teacherDetail.tid}
+	</update>
+
+	<select id="isExist" parameterType="string" resultType="int">
+		select
+		count(*) from teacherinfo where tnum=#{tnum};
+	</select>
+</mapper>

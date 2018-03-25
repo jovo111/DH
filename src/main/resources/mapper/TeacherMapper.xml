@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.TeacherMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.Teacher">
+		<result column="tid" jdbcType="INTEGER" property="tid" />
+		<result column="tnum" jdbcType="VARCHAR" property="tnum" />
+		<result column="tpwd" jdbcType="VARCHAR" property="tpwd" />
+
+		<association property="teacherDetail" javaType="com.JOVO.model.TeacherDetail">
+			<id property="tid" column="tid" />
+			<result property="tname" column="tname"/>
+			<result property="tphoto" column="tphoto" />
+			<result property="tphone" column="tphone" />
+			<result property="tinfo" column="tinfo" />
+			<result property="tsource" column="tsource" />
+		</association>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		a.tid,a.tnum,b.tname,b.tphoto,b.tphone,b.tinfo,b.tsource
+	</sql>
+	<select id="select"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from teacherinfo a inner join teacherDetailInfo b on a.tid=b.tid
+	</select>
+	
+	<select id="selectByExample" parameterType="string"
+		resultMap="BaseResultMap" >
+		select
+		<include refid="Base_Column_List" />
+		from teacherinfo a inner join teacherDetailInfo b on a.tid=b.tid where
+		b.tname like '%${example}%'
+	</select>
+	
+	<insert id="insert" parameterType="com.JOVO.model.Teacher" keyProperty="tid" useGeneratedKeys="true">
+		insert into teacherinfo (tnum, tpwd
+		)
+		values (#{tnum,jdbcType=VARCHAR},
+		#{tpwd,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<select id="selectOne" parameterType="int"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from teacherinfo a inner join teacherDetailInfo b on a.tid=b.tid where a.tid=#{tid}
+	</select>
+	
+	<update id="update" parameterType="com.JOVO.model.Teacher">
+		update teacherinfo
+		set tpwd = #{record.tpwd,jdbcType=VARCHAR} where tid = #{record.tid,jdbcType=INTEGER}
+	</update>
+	
+	<delete id="deleteTeacher" parameterType="int">
+		delete t1,t2 from teacherdetailinfo t1,teacherinfo t2 where t1.tid=#{tid} and t2.tid=#{tid}
+  	</delete>
+</mapper>

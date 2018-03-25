@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.StudentMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.Student">
+		<result column="sid" jdbcType="INTEGER" property="sid" />
+		<result column="snum" jdbcType="VARCHAR" property="snum" />
+		<result column="spwd" jdbcType="VARCHAR" property="spwd" />
+
+		<association property="studentDetail" javaType="com.JOVO.model.StudentDetail">
+			<id property="sid" column="sid" />
+			<result property="sphoto" column="sphoto" />
+			<result property="snick" column="snick" />
+			<result property="sbalance" column="sbalance" />
+		</association>
+		
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		a.sid,a.snum,b.sphoto,b.snick,b.sbalance
+	</sql>
+	
+	<select id="select" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from studentinfo a inner join studentDetailInfo b on a.sid=b.sid
+	</select>
+
+	<select id="selectByExample" parameterType="string" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from studentinfo a inner join studentDetailInfo b on a.sid=b.sid where
+		b.snick like '%${example}%'
+	</select>
+
+	<delete id="deleteStudent" parameterType="int">
+		delete t1,t2 from studentdetailinfo t1,studentinfo t2 where t1.sid=#{sid} and t2.sid=#{sid}
+	</delete>
+	
+	<insert id="insert" parameterType="com.JOVO.model.Student" keyProperty="sid" useGeneratedKeys="true">
+		insert into studentinfo (
+		snum, spwd
+		)
+		values ( #{snum,jdbcType=VARCHAR},
+		#{spwd,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	
+	<update id="update" parameterType="com.JOVO.model.Student">
+		update studentinfo
+		set spwd = #{record.spwd,jdbcType=VARCHAR} where sid = #{record.sid,jdbcType=INTEGER}
+	</update>
+	
+	<select id="selectOne" parameterType="int" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from studentinfo a inner join studentDetailInfo b on a.sid=b.sid where a.sid=#{sid} and b.sid=#{sid}
+	</select>
+</mapper>

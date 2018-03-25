@@ -1,0 +1,68 @@
+
+#p1 {
+	position: relative;
+	display: inline-block;
+}
+#p2{
+	overflow : hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+}
+#a1 {
+	position: absolute;/*绝对定位*/
+	border: 1px solid #000;
+	right: 0px;
+	top: 0px;
+	font-size: 18px;
+	color: #FFF;
+	background-color:#000;
+}
+.div1{
+	background-color:#06F;
+	font-size:18px;
+	color:#FFF;
+	padding-left:10px;
+	margin-right:-8px;
+	width:40px;
+}
+.div2{
+	font-size:13px;
+	color:#999;
+	margin-right:10px;
+}
+.table1 td{
+	background-color:#f0f6fa;
+	border-bottom:1px solid #ffffff;
+	border-left: solid 2px #c4d5df;
+}
+
+.table1 td a{
+	color:#557386;
+	text-decoration: none;
+}
+
+.table1 td a:hover{
+	color:#169ef4;
+}
+
+.table1 td:hover {
+    color: #169ef4;
+    background: #ecf5fb;
+    border-left: solid 2px #169ef4;
+}
+
+
+#feed tr td{
+	border-bottom:solid 3px #ffffff;
+	background:#fafafa;
+}
+
+#span span{
+	color:#b5c1c9;
+}
+
+#span span:hover{
+	color:#3d94ce;
+}

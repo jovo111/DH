@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.face.qtAuditCourseMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.Course">
+		<id column="cid" jdbcType="INTEGER" property="cid" />
+		<result column="cname" jdbcType="VARCHAR" property="cname" />
+		<result column="cprice" jdbcType="VARCHAR" property="cprice" />
+		<result column="cphoto" jdbcType="VARCHAR" property="cphoto" />
+		<result column="ispass" jdbcType="VARCHAR" property="ispass" />
+		<result column="tid" jdbcType="INTEGER" property="tid" />
+		<association property="teacherDetail" javaType="com.JOVO.model.TeacherDetail">
+			<id property="tid" column="tid" />
+			<result property="tname" column="tname" />
+		</association>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		a.cid,b.tname,a.cname,a.cphoto,a.cprice,a.ispass
+	</sql>
+
+	<select id="auditcourses" parameterType="int" resultMap="BaseResultMap">
+		select
+		a.cid,b.tname,a.cname,a.cphoto,a.cprice,a.ispass
+		from courseinfo a inner join teacherdetailinfo b on a.tid=b.tid
+		where a.tid=#{tid} and a.ispass=0
+	</select>
+
+	<insert id="insert" parameterType="com.JOVO.model.Course" keyProperty="cid" useGeneratedKeys="true">
+		insert into courseinfo
+		(cname, cinfo,
+		typeid, cprice, cphoto,
+		tid)
+		values
+		(#{cname,jdbcType=VARCHAR},
+		#{cinfo,jdbcType=VARCHAR},
+		#{typeid,jdbcType=INTEGER}, #{cprice,jdbcType=REAL},
+		#{cphoto,jdbcType=VARCHAR},
+		#{tid,jdbcType=INTEGER})
+	</insert>
+
+
+	<update id="update" parameterType="com.JOVO.model.Course">
+		update courseinfo
+		set
+		cinfo=#{record.cinfo,jdbcType=VARCHAR},
+		cname=#{record.cname,jdbcType=VARCHAR},
+		typeid=#{record.typeid,jdbcType=INTEGER},
+		cphoto=#{record.cphoto,jdbcType=VARCHAR},
+		cprice=#{record.cprice,jdbcType=REAL} 
+		where cid =#{record.cid,jdbcType=INTEGER}
+	</update>
+</mapper>

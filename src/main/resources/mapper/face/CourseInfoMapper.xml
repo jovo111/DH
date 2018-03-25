@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.face.CourseInfoMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.CourseInfo">
+		<result column="cid" jdbcType="INTEGER" property="cid" />
+		<result column="tid" jdbcType="INTEGER" property="tid" />
+		<result column="cname" jdbcType="VARCHAR" property="cname" />
+		<result column="cinfo" jdbcType="VARCHAR" property="cinfo" />
+		<result column="typeid" jdbcType="INTEGER" property="typeid" />
+		<result column="cprice" jdbcType="REAL" property="cprice" />
+		<result column="cphoto" jdbcType="VARCHAR" property="cphoto" />
+		<result column="stucount" jdbcType="INTEGER" property="stucount" />
+		<association property="teacherdetail" javaType="com.JOVO.model.TeacherDetail">
+			<result column="tname" property="tname" />
+			<result column="tphoto" property="tphoto" />
+			<result column="tinfo" property="tinfo" />
+			<result column="tsource" property="tsource" />
+		</association>
+		<association property="task" javaType="com.JOVO.model.Task">
+			<result column="taskid" jdbcType="INTEGER" property="taskid" />
+			<result column="cid" jdbcType="INTEGER" property="cid" />
+			<result column="task" property="task" />
+			<result column="videopath" property="videopath" />
+		</association>
+		<association property="mycourse" javaType="com.JOVO.model.MyCourse">
+			<result column="mid" jdbcType="INTEGER" property="mid" />
+			<result column="cid" jdbcType="INTEGER" property="cid" />
+			<result column="sid" jdbcType="INTEGER" property="sid" />
+		</association>
+		<association property="studentdetail" javaType="com.JOVO.model.StudentDetail">
+			<result column="sid" jdbcType="INTEGER" property="sid" />
+			<result column="sphoto" property="sphoto" />
+			<result column="sbalance" jdbcType="FLOAT" property="sbalance" />
+			<result column="snick" property="snick" />
+		</association>
+		<association property="discussinfo" javaType="com.JOVO.model.Discuss">
+			<result column="did" jdbcType="INTEGER" property="did" />
+			<result column="cid" jdbcType="INTEGER" property="cid" />
+			<result column="sid" jdbcType="INTEGER" property="sid" />
+			<result column="discuss" jdbcType="VARCHAR" property="discuss" />
+			<result column="distime" property="distime" />
+		</association>
+	</resultMap>
+	
+	
+	
+	<sql id="column">
+		cid, c.tid, cname, cinfo, cprice,
+		cphoto,stucount,tname,tphoto,tinfo,tsource
+	</sql>
+
+	<select id="selectid" resultMap="BaseResultMap">
+		select
+		<include refid="column" />
+		from courseinfo c inner join teacherdetailinfo t on c.tid=t.tid
+		where
+		cid=#{cid}
+	</select>
+	<select id="stask" resultMap="BaseResultMap">
+		SELECT taskid,task FROM taskinfo WHERE
+		cid=#{cid};
+	</select>
+	<select id="students" resultMap="BaseResultMap">
+		SELECT s.snick,s.sphoto FROM
+		studentdetailinfo s WHERE sid IN (SELECT sid
+		FROM mycourseinfo WHERE
+		cid=#{cid});
+	</select>
+	<select id="discussinfos" resultMap="BaseResultMap">
+		SELECT
+		snick,sphoto,discuss,distime FROM discussinfo d INNER JOIN
+		studentdetailinfo s ON d.`sid`=s.`sid` WHERE d.cid=1;
+	</select>
+	
+	<select id="selectOne" resultType="com.JOVO.model.Task">
+		SELECT taskid,cid,task,videopath FROM taskinfo WHERE
+		taskid=#{taskid};
+	</select>
+
+
+	<insert id="insert" parameterType="com.JOVO.model.Discuss">
+		insert into discussinfo (cid,
+		sid, discuss)
+		values ( #{cid,jdbcType=INTEGER},
+		#{sid,jdbcType=INTEGER},
+		#{discuss,jdbcType=LONGVARCHAR})
+	</insert>
+</mapper>
+
+
+
+

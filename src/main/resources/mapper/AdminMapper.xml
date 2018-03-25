@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.AdminMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.Admin">
+		<result column="aid" jdbcType="VARCHAR" property="aid" />
+		<result column="aphoto" jdbcType="VARCHAR" property="aphoto" />
+		<result column="aname" jdbcType="VARCHAR" property="aname" />
+		<result column="apwd" jdbcType="VARCHAR" property="apwd" />
+	</resultMap>
+
+
+	<sql id="Base_Column_List">
+		aid, aname, apwd,aphoto
+	</sql>
+
+	<select id="select" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from admininfo
+	</select>
+
+	<select id="selectByExample" parameterType="string" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from admininfo where aname like '%${example}%'
+	</select>
+
+	<select id="selectOne" parameterType="com.JOVO.model.Admin"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from admininfo where aid=#{aid}
+	</select>
+
+	<select id="valitage" parameterType="string" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from admininfo where aid=#{aid}
+	</select>
+
+	<delete id="delete" parameterType="int">
+		delete from admininfo where
+		aid=#{aid}
+	</delete>
+
+
+	<insert id="insert" parameterType="com.JOVO.model.Admin">
+		insert into admininfo
+		(aid,aphoto,aname, apwd)
+		values (#{aid,jdbcType=VARCHAR},
+		#{aphoto,jdbcType=VARCHAR},
+		#{aname,jdbcType=VARCHAR},
+		#{apwd,jdbcType=VARCHAR}
+		)
+	</insert>
+
+
+	<update id="update" parameterType="com.JOVO.model.Admin">
+		update admininfo
+		<set>
+			<if test="record.aname != null"> aname = #{record.aname,jdbcType=VARCHAR}, </if>
+			<if test="record.apwd != null"> apwd = #{record.apwd,jdbcType=VARCHAR}, </if>
+			<if test="record.aphoto != null"> aname = #{record.aname,jdbcType=VARCHAR}, </if>
+		</set>
+		where aid = #{record.aid,jdbcType=VARCHAR}
+	</update>
+</mapper>

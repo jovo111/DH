@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.CourseTypeMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.CourseType">
+		<result column="typeid" jdbcType="INTEGER" property="typeid" />
+		<result column="typename" jdbcType="VARCHAR" property="typename" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		typeid, typename
+	</sql>
+
+	<select id="getAll" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from coursetypeinfo
+	</select>
+
+	<select id="getLikeAll" resultMap="BaseResultMap" parameterType="string">
+		select
+		<include refid="Base_Column_List" />
+		from coursetypeinfo where typename like '%${typename}%'
+	</select>
+
+	<delete id="delete" parameterType="int">
+		delete from coursetypeinfo
+		where typeid=#{typeid}
+	</delete>
+
+
+	<insert id="insert" parameterType="com.JOVO.model.CourseType">
+		insert into coursetypeinfo
+		(typename)
+		values (#{typename,jdbcType=VARCHAR})
+	</insert>
+
+	<update id="update" parameterType="com.JOVO.model.CourseType"> update coursetypeinfo set
+		typename = #{record.typename,jdbcType=VARCHAR} where typeid =
+		#{record.typeid,jdbcType=INTEGER}
+	</update>
+
+</mapper>

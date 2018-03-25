@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.MyCourseMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.MyCourse">
+		<result column="mid" jdbcType="INTEGER" property="mid" />
+		<result column="sid" jdbcType="INTEGER" property="sid" />
+		<result column="cid" jdbcType="INTEGER" property="cid" />
+		<result column="DATE_FORMAT(m.begin,'%Y-%m-%d')" property="begin" />
+		<result column="progress" jdbcType="REAL" property="progress" />
+		<association property="course" javaType="com.JOVO.model.Course">
+			<id column="cid" jdbcType="INTEGER" property="cid" />
+			<result column="tid" jdbcType="INTEGER" property="tid" />
+			<result column="cname" jdbcType="VARCHAR" property="cname" />
+			<result column="cinfo" jdbcType="VARCHAR" property="cinfo" />
+			<result column="typeid" jdbcType="INTEGER" property="typeid" />
+			<result column="cprice" jdbcType="REAL" property="cprice" />
+			<result column="cphoto" jdbcType="VARCHAR" property="cphoto" />
+			<association property="courseType" javaType="com.JOVO.model.CourseType">
+				<id column="typeid" jdbcType="INTEGER" property="typeid" />
+				<result column="typename" jdbcType="VARCHAR" property="typename" />
+			</association>
+		</association>
+	</resultMap>
+
+
+	<resultMap id="Students" type="com.JOVO.model.MyCourse">
+		<result column="mid" jdbcType="INTEGER" property="mid" />
+		<result column="sid" jdbcType="INTEGER" property="sid" />
+		<association property="studentDetail" javaType="com.JOVO.model.StudentDetail">
+			<id column="sid" jdbcType="INTEGER" property="sid" />
+			<result column="sphoto" jdbcType="VARCHAR" property="sphoto" />
+			<result column="snick" jdbcType="VARCHAR" property="snick" />
+		</association>
+	</resultMap>
+
+	<sql id="students">
+		s.sid,s.snick,s.sphoto
+	</sql>
+
+	<sql id="Base_Column_List">
+		m.mid, m.sid, m.cid, DATE_FORMAT(m.begin,'%Y-%m-%d'),
+		m.progress,
+		c.cid,c.tid,c.cname,c.cinfo,c.typeid,c.cprice,c.cphoto,
+		ctype.typeid,ctype.typename
+	</sql>
+	<select id="selectByExample" parameterType="int" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from mycourseinfo m inner join courseinfo c on m.cid=c.cid inner join
+		coursetypeinfo ctype on c.typeid=ctype.typeid
+		where m.sid=#{sid}
+	</select>
+	<delete id="deleteByExample" parameterType="int">
+		delete from
+		mycourseinfo where mid=#{mid}
+	</delete>
+	<insert id="insert" parameterType="com.JOVO.model.MyCourse">
+		insert into mycourseinfo (sid,
+		cid,
+		begin, progress)
+		values (#{sid,jdbcType=INTEGER},
+		#{cid,jdbcType=INTEGER},
+		#{begin,jdbcType=DATE},
+		#{progress,jdbcType=REAL})
+	</insert>
+
+
+	<update id="updateByExample" parameterType="map">
+		update mycourseinfo
+		set
+		sid = #{record.sid,jdbcType=INTEGER},
+		cid =
+		#{record.cid,jdbcType=INTEGER},
+		begin = #{record.begin,jdbcType=DATE},
+		progress = #{record.progress,jdbcType=REAL}
+		where mid =
+		#{record.mid,jdbcType=INTEGER}
+	</update>
+
+	<select id="courseCount" parameterType="int" resultType="long">
+		select
+		count(cid) from mycourseinfo where cid=#{cid};
+	</select>
+
+	<select id="selectStudents" resultMap="Students" parameterType="int" >
+		select
+		<include refid="students" />
+		from mycourseinfo m inner join courseinfo c on
+		m.cid=c.cid inner join
+		studentdetailinfo s on s.sid=m.sid inner join
+		teacherdetailinfo t on
+		t.tid=c.tid where t.tid=#{tid};
+	</select>
+
+</mapper>

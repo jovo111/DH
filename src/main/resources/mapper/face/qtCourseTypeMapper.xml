@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.face.qtCourseTypeMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.CourseType">
+		<id column="typeid" jdbcType="INTEGER" property="typeid" />
+		<result column="typename" jdbcType="VARCHAR" property="typename" />
+		<collection property="courses" ofType="com.JOVO.model.Course">
+			<id column="cid" jdbcType="INTEGER" property="cid" />
+			<result column="tid" jdbcType="INTEGER" property="tid" />
+			<result column="cname" jdbcType="VARCHAR" property="cname" />
+			<result column="typeid" jdbcType="INTEGER" property="typeid" />
+			<result column="cphoto" jdbcType="VARCHAR" property="cphoto" />
+			<result column="stucount" jdbcType="INTEGER" property="stucount" />
+			<association property="teacherDetail" javaType="com.JOVO.model.TeacherDetail">
+				<id property="tid" column="tid" />
+				<result property="tname" column="tname" />
+			</association>
+		</collection>
+	</resultMap>
+	
+	<resultMap id="CourseTypeMap" type="com.JOVO.model.CourseType">
+		<id column="typeid" jdbcType="INTEGER" property="typeid" />
+		<result column="typename" jdbcType="VARCHAR" property="typename" />
+	</resultMap>
+
+	<sql id="index_List">
+		c.cid,c.tid,c.cphoto,c.cname,t2.tname,t1.typename,t1.typeId
+	</sql>
+
+	<!-- <select id="oneToMany" resultMap="BaseResultMap"> select * from coursetypeinfo 
+		</select> -->
+
+	<select id="courses" resultMap="BaseResultMap">
+		select
+		<include refid="index_List" />
+		from Courseinfo c inner join coursetypeinfo t1 on t1.typeid=c.typeid
+		inner join teacherdetailinfo t2 on c.tid=t2.tid where c.ispass=1
+	</select>
+
+	<select id="courseTypes" resultMap="CourseTypeMap" parameterType="int">
+		select t.typeid,t.typename
+		from coursetypeinfo t inner JOIN basetypeinfo b on t.baseid=b.baseid
+		where t.baseid=#{baseid};
+	</select>
+	
+	<select id="selectAll" resultMap="CourseTypeMap">
+		select typeid,typename from coursetypeinfo
+	</select>
+
+</mapper>

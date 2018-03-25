@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.face.qtTaskMapper">
+  <resultMap id="BaseResultMap" type="com.JOVO.model.Task">
+    <result column="taskid" jdbcType="INTEGER" property="taskid" />
+    <result column="cid" jdbcType="INTEGER" property="cid" />
+    <result column="videopath" jdbcType="VARCHAR" property="videopath" />
+    <result column="task" jdbcType="LONGVARCHAR" property="task" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    taskid, cid, task,videopath
+  </sql>
+  
+  <select id="courseTask" resultMap="BaseResultMap" parameterType="int" >
+  	select
+  		taskid,cid,task,videopath
+  	from taskinfo where cid=#{cid}
+  </select>
+  
+  <select id="taskCount" resultType="long" parameterType="int" >
+  	select COUNT(cid) from taskinfo where cid=#{cid}
+  </select>
+  
+  
+  <select id="selectOne" resultMap="BaseResultMap" parameterType="int" >
+  	select
+  	 <include refid="Base_Column_List" />
+  	 from taskinfo where taskid=#{taskid}
+  </select>
+  
+  <insert id="insert" parameterType="com.JOVO.model.Task">
+    insert into taskinfo (cid, videopath, 
+      task)
+    values (#{cid,jdbcType=INTEGER}, #{videopath,jdbcType=VARCHAR}, 
+      #{task,jdbcType=LONGVARCHAR})
+  </insert>
+
+  
+  <update id="update" parameterType="com.JOVO.model.Task">
+    update taskinfo
+    set cid = #{cid},videopath = #{videopath},task = #{task}
+    where taskid = #{taskid}
+  </update>
+  
+  <delete id="delete" parameterType="int" >
+  	delete from taskinfo where taskid=#{taskid}
+  </delete>
+  
+  <select id="tasks" parameterType="int" resultMap="BaseResultMap" >
+  	select 
+  		<include refid="Base_Column_List" />
+  	from taskinfo where cid=#{cid}
+  </select>
+  
+</mapper>

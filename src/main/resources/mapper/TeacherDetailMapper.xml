@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.TeacherDetailMapper">
+  <resultMap id="BaseResultMap" type="com.JOVO.model.TeacherDetail">
+    <result column="tid" jdbcType="INTEGER" property="tid" />
+    <result column="tname" jdbcType="VARCHAR" property="tname" />
+    <result column="tphoto" jdbcType="VARCHAR" property="tphoto" />
+    <result column="tphone" jdbcType="VARCHAR" property="tphone" />
+    <result column="tinfo" jdbcType="VARCHAR" property="tinfo" />
+    <result column="tsource" jdbcType="VARCHAR" property="tsource" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    tid,tname, tphoto, tphone, tinfo, tsource
+  </sql>
+  <select id="select" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from teacherdetailinfo 
+  </select>
+  
+  
+  <insert id="insert" parameterType="com.JOVO.model.TeacherDetail">
+    insert into teacherdetailinfo (tid,tname, tphoto, tphone, tinfo, tsource)
+    values (#{tid,jdbcType=INTEGER},#{tname,jdbcType=VARCHAR}, #{tphoto,jdbcType=VARCHAR}, #{tphone,jdbcType=VARCHAR}, 
+      #{tinfo,jdbcType=VARCHAR}, #{tsource,jdbcType=VARCHAR})
+  </insert>
+  
+  
+  <update id="update" parameterType="com.JOVO.model.TeacherDetail">
+    update teacherdetailinfo
+    set tname = #{record.tname,jdbcType=VARCHAR},
+      tphoto = #{record.tphoto,jdbcType=VARCHAR},
+      tphone = #{record.tphone,jdbcType=VARCHAR},
+      tinfo = #{record.tinfo,jdbcType=VARCHAR},
+      tsource = #{record.tsource,jdbcType=VARCHAR}
+      where tid = #{record.tid,jdbcType=INTEGER}
+  </update>
+</mapper>

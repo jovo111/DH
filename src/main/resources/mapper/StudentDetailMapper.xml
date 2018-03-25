@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.JOVO.dao.StudentDetailMapper">
+	<resultMap id="BaseResultMap" type="com.JOVO.model.StudentDetail">
+		<result column="sid" jdbcType="INTEGER" property="sid" />
+		<result column="sphoto" jdbcType="VARCHAR" property="sphoto" />
+		<result column="snick" jdbcType="VARCHAR" property="snick" />
+		<result column="sbalance" jdbcType="REAL" property="sbalance" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		sid, sphoto, snick, sbalance
+	</sql>
+
+	<select id="select" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from studentdetailinfo
+	</select>
+
+	<insert id="insert" parameterType="com.JOVO.model.StudentDetail">
+		insert into studentdetailinfo (sid, sphoto, snick, sbalance) values
+		(#{sid,jdbcType=INTEGER}, #{sphoto,jdbcType=VARCHAR},
+		#{snick,jdbcType=VARCHAR}, #{sbalance,jdbcType=REAL})
+	</insert>
+
+	<update id="update" parameterType="com.JOVO.model.StudentDetail">
+		update studentdetailinfo
+		set sphoto = #{record.sphoto,jdbcType=VARCHAR},
+		snick = #{record.snick,jdbcType=VARCHAR},
+		sbalance = #{record.sbalance,jdbcType=REAL}
+		where sid = #{record.sid,jdbcType=INTEGER}
+	</update>
+	
+</mapper>
